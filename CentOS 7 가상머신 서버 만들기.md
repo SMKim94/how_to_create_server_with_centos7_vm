@@ -1,8 +1,7 @@
 # CentOS 7 가상머신 서버 만들기
 
 ## 목차
-1. [CentOS 7 설치](#centOS-7-설치)
-2. [Docker 설치](#docker-설치)
+1. [CentOS 7 설치](#centos-7-설치)
 
 ## CentOS 7 설치
 - Oracle VM VirtualBox 홈페이지 : https://www.virtualbox.org/
@@ -55,11 +54,11 @@
 | mgr    | AOSLWJ001!   | 관리자(wheel) |
 
 ### 초기 설정 명령어
-```
-// 패키지 업데이트
+```shell
+# 패키지 업데이트
 sudo yum update -y
 
-// 필요한 도구 설치
+# 필요한 도구 설치
 sudo yum install net-tools vim -y
 ```
 
@@ -67,67 +66,67 @@ sudo yum install net-tools vim -y
 - SSH 접속을 위한 포트를 기본 22/tcp에서 2222/tcp로 변경하여 사용한다.
 
 #### 포트 변경 - SELinux에 SSH 포트 추가
-```
-// SELinux 설정을 위한 SEManage 설치
+```shell
+# SELinux 설정을 위한 SEManage 설치
 sudo yum install policycoreutils-python -y
 
-// SELinux에 SSH 포트를 2222/tcp 로 설정
+# SELinux에 SSH 포트를 2222/tcp 로 설정
 sudo semanage port -a -t ssh_port_t -p tcp 2222
 ```
 
 #### 포트 변경 - 방화벽 설정
-```
-// 2222/tcp 포트 영구 허용
+```shell
+# 2222/tcp 포트 영구 허용
 sudo firewall-cmd --permanent --add-port=2222/tcp
 
-// 방화벽 재시작
+# 방화벽 재시작
 sudo firewall-cmd --reload
 ```
 
 #### 포트 변경 - SSH 설정 파일 수정
-```
-// SSH 설정 파일 열기
+```shell
+# SSH 설정 파일 열기
 sudo vim /etc/ssh/sshd_config
 
-// #Port 22를 Port 2222 로 변경
+# #Port 22를 Port 2222 로 변경
 Port 2222
 
-// SSH 설정 파일 저장
+# SSH 설정 파일 저장
 :wq
 ```
 또는
-```
-// SSH 설정 파일에서 #Port 설정 확인
+```shell
+# SSH 설정 파일에서 #Port 설정 확인
 sudo grep '#Port' /etc/ssh/sshd_config
 
-// Port 주석 제거 및 2222 포트로 변경
+# Port 주석 제거 및 2222 포트로 변경
 sudo sed -i '/^#Port 22/c\Port 2222' /etc/ssh/sshd_config
 
-// SSH 서비스 재시작
+# SSH 서비스 재시작
 sudo systemctl reload sshd
 ```
 
 #### 키 파일 - 생성
 사용자 PC에서 개인 키, 공개 키 파일 생성.
-```
+```bat
 ssh-keygen -t <암호화 방식> -b <키의 길이> -f <키 파일 이름 저장> -a <KDF 반복 횟수> -C <주석>
 ```
 아래는 Windows cmd로 실행한 결과이다.
-```
-// 키 생성 명령어
+```bat
+REM 키 생성 명령어
 C:\Users\<사용자 계정>\.ssh>ssh-keygen -t rsa -b 4096
 Generating public/private rsa key pair.
 
-// 키 파일 이름 설정
+REM 키 파일 이름 설정
 Enter file in which to save the key (C:\Users\ksm/.ssh/id_rsa): <키 파일 이름>
 
-// 키 파일 비밀번호 설정
+REM 키 파일 비밀번호 설정
 Enter passphrase (empty for no passphrase):
 
-// 키 파일 비밀번호 재입력
+REM 키 파일 비밀번호 재입력
 Enter same passphrase again:
 
-// 생성 결과
+REM 생성 결과
 Your identification has been saved in <키 파일 이름>
 Your public key has been saved in <키 파일 이름>.pub
 The key fingerprint is:
@@ -148,11 +147,11 @@ The key's randomart image is:
 
 #### 키 파일 - 가상머신으로 공개 키 파일 전송
 Secure Copy Protocol(SCP)를 사용하여 사용자 PC에서 가상머신으로 공개 키 파일을 전송한다.
-```
+```bat
 scp -P <포트 번호> "<파일>" <원격지 계정>@<원격지 주소>:<원격지 폴더 위치>
 ```
 아래는 Windows cmd로 실행한 결과이다.
-```
+```bat
 C:\Users\<사용자 계정>\.ssh>scp -P 2222 "C:\Users\<사용자 계정>\.ssh\<키 파일 이름>.pub" 
 mgr@192.168.100.5's password: <비밀번호 입력>
 <키 파일 이름>.pub          100%  748   373.3KB/s   00:00
@@ -163,23 +162,22 @@ mgr@192.168.100.5's password: <비밀번호 입력>
 - authorized_keys 파일이 없다면 파일을 생성하면 된다.
 - authorized_keys 파일은 공개 키를 저장하는 매우 중요한 파일이기 때문에 다른 사용자가 파일을 읽거나 수정할 수 없도록 권한을 제한하는 것이 좋다.
 
-```
-// authorized_keys 파일 마지막에 공개 키 내용을 추가한다.
-// authorized_keys 파일이 없다면 authorized_keys 파일을 생성한다.
+```shell
+# authorized_keys 파일 마지막에 공개 키 내용을 추가한다.
+# authorized_keys 파일이 없다면 authorized_keys 파일을 생성한다.
 cat <키 파일 이름>.pub >> authorized_keys
 
-// authrozied_keys 파일의 권한을 제한한다.
+# authrozied_keys 파일의 권한을 제한한다.
 chmod 600 authorized_keys
 
-// 공개 키의 내용을 authorized_keys 파일에 추가했기 때문에 공개 키 파일은 제거한다.
+# 공개 키의 내용을 authorized_keys 파일에 추가했기 때문에 공개 키 파일은 제거한다.
 rm <키 파일 이름>.pub
 ```
 
 - 참고 : 왜 authorized_keys 파일이냐면, SSH 설정 파일(```/etc/ssh/sshd_config```)의 ***AuthorizedKeysFile*** 옵션에 설정되어 있어서 그렇다.
 
 #### 사용자 PC에서 SSH로 가상머신 접속
-```
+```bat
 ssh -i "<사용자 PC의 개인 키 파일>" -p <포트 번호> <원격지 계정>@<원격지 주소>
 ```
 또는 PuTTY나 MobaXterm으로 접속한다.
-
