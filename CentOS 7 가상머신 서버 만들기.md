@@ -1,8 +1,8 @@
 # CentOS 7 가상머신 서버 만들기
 
 ## 목차
-1. [CentOS 7 설치](#-centOS-7-설치)
-2. [Docker 설치](#-docker-설치)
+1. [CentOS 7 설치](#centOS-7-설치)
+2. [Docker 설치](#docker-설치)
 
 ## CentOS 7 설치
 - Oracle VM VirtualBox 홈페이지 : https://www.virtualbox.org/
