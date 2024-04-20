@@ -2,6 +2,7 @@
 
 ## 목차
 1. [CentOS 7 설치](#centos-7-설치)
+2. [Docker 설치](#docker-설치)
 
 ## CentOS 7 설치
 - Oracle VM VirtualBox 홈페이지 : https://www.virtualbox.org/
@@ -181,3 +182,88 @@ rm <키 파일 이름>.pub
 ssh -i "<사용자 PC의 개인 키 파일>" -p <포트 번호> <원격지 계정>@<원격지 주소>
 ```
 또는 PuTTY나 MobaXterm으로 접속한다.
+
+## Docker 설치
+
+### 설치 준비
+참고 : [Install Docker Engine on CentOS](https://docs.docker.com/engine/install/centos/)
+
+#### (옵션) 이전 버전 Docker 삭제
+만약을 위해 이전 버전의 Docker를 삭제한다.
+```shell
+# 한 줄
+sudo yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
+```
+```shell
+# 여러 줄
+sudo yum remove docker \
+                docker-client \
+                docker-client-latest \
+                docker-common \
+                docker-latest \
+                docker-latest-logrotate \
+                docker-logrotate \
+                docker-engine
+```
+
+나머지 Docker 관련 파일 제거
+```shell
+rm -rf /var/lib/docker
+```
+
+#### yum-utils 패키지 설치
+- yum 관련 유틸리티 도구.
+- 저장소를 관리하는 ***yum-config-manage***이 포함됨.
+- Docker의 경우 공식 CentOS 저장소가 아닌 Docker 자체의 저장소를 사용함.
+- ***yum-config-manager***를 사용하여 Docker 저장소를 추가, 관리할 수 있음.
+```shell
+sudo yum install yum-utils -y
+```
+
+#### Docker 저장소 추가
+```shell
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+#### Docker 패키지 설치
+```shell
+sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+```
+
+#### Docker 서비스 실행
+```shell
+sudo systemctl start docker
+```
+정상 실행되었다면 아래와 같이 나타난다.
+```shell
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+```
+
+#### Docker 서비스 자동 실행 설정
+```shell
+sudo systemctl enable docker
+```
+
+#### Docker 테스트
+```shell
+sudo docker run hello-world
+```
