@@ -234,6 +234,16 @@ sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin dock
 ```shell
 sudo systemctl start docker
 ```
+
+#### Docker 서비스 자동 실행 설정
+```shell
+sudo systemctl enable docker
+```
+
+#### Docker 테스트
+```shell
+sudo docker run hello-world
+```
 정상 실행되었다면 아래와 같이 나타난다.
 ```shell
 Hello from Docker!
@@ -256,14 +266,4 @@ Share images, automate workflows, and more with a free Docker ID:
 
 For more examples and ideas, visit:
  https://docs.docker.com/get-started/
-```
-
-#### Docker 서비스 자동 실행 설정
-```shell
-sudo systemctl enable docker
-```
-
-#### Docker 테스트
-```shell
-sudo docker run hello-world
 ```
